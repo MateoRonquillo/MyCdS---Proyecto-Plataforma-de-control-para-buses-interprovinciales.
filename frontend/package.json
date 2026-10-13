@@ -2,5 +2,20 @@
   "name": "gestion-pasajes-ecuador-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "Frontend para el sistema de gestion de pasajes en Ecuador"
+  "description": "Frontend para el sistema de gestion de pasajes en Ecuador",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "pinia": "^4.0.3",
+    "vue": "^3.5.44",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.10",
+    "vite": "^8.3.4"
+  }
 }
