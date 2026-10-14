@@ -1,1 +1,9 @@
-# TODO: declarar los servicios cuando se definan sus imagenes y configuracion.
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gestion_pasajes
+    ports:
+      - "3306:3306"
