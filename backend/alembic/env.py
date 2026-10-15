@@ -17,7 +17,7 @@ config = context.config
 # Leer la variable de entorno o usar la base local de Docker
 database_url = os.getenv(
     "DATABASE_URL", 
-    "mysql+pymysql://root:root@localhost:3306/gestion_pasajes"
+    "mysql+pymysql://root:root@127.0.0.1:3306/gestion_pasajes"
 )
 config.set_main_option("sqlalchemy.url", database_url)
 
