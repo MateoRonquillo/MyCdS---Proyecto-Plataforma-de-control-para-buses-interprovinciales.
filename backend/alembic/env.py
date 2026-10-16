@@ -4,21 +4,22 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
+from dotenv import load_dotenv
 
 # Añadir el directorio 'backend' al path para que Python encuentre 'app'
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-# Importar la base y tus modelos
+# Importar la base y modelos
 from app.db.database import Base
 import app.models.core_models
 
+# Cargar las variables del archivo .env a la memoria
+load_dotenv()
+
 config = context.config
 
-# Leer la variable de entorno o usar la base local de Docker
-database_url = os.getenv(
-    "DATABASE_URL", 
-    "mysql+pymysql://root:root@127.0.0.1:3306/gestion_pasajes"
-)
+# Leer la variable de entorno 
+database_url = os.getenv("DATABASE_URL")
 config.set_main_option("sqlalchemy.url", database_url)
 
 if config.config_file_name is not None:

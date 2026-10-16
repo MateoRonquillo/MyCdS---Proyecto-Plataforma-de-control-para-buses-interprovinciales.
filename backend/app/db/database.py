@@ -1,13 +1,12 @@
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Buscamos la variable de entorno DATABASE_URL.
-# Si no existe (ej. en tu PC local), usamos tu cadena por defecto.
-SQLALCHEMY_DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "mysql+pymysql://root:root@127.0.0.1:3306/gestion_pasajes"
-)
+load_dotenv()
+
+# Se usa estrictamente la variable de entorno
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
