@@ -11,7 +11,8 @@ from app.models.core_models import Usuario
 
 
 @pytest.fixture
-def auth_client() -> TestClient:
+def auth_client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
+    monkeypatch.setenv("JWT_SECRET_KEY", "test-secret-key-with-at-least-32-characters")
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -52,21 +53,36 @@ def auth_client() -> TestClient:
     return TestClient(application)
 
 
-def test_login_returns_user_profile_without_token(auth_client: TestClient) -> None:
+def test_login_returns_jwt_and_profile(auth_client: TestClient) -> None:
     response = auth_client.post(
         "/api/v1/auth/login",
         json={"correo": "cliente@example.com", "password": "correct-password"},
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "usuario": {
-            "id": 1,
-            "nombre": "Cliente de prueba",
-            "correo": "cliente@example.com",
-            "rol": "cliente",
-        }
+    assert response.json()["token_type"] == "bearer"
+    assert response.json()["usuario"] == {
+        "id": 1,
+        "nombre": "Cliente de prueba",
+        "correo": "cliente@example.com",
+        "rol": "cliente",
     }
+    token = response.json()["access_token"]
+    profile = auth_client.get(
+        "/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert profile.status_code == 200
+    assert profile.json()["correo"] == "cliente@example.com"
+
+
+def test_current_user_requires_valid_bearer_token(auth_client: TestClient) -> None:
+    missing_token = auth_client.get("/api/v1/auth/me")
+    invalid_token = auth_client.get(
+        "/api/v1/auth/me", headers={"Authorization": "Bearer invalid"}
+    )
+
+    assert missing_token.status_code == 401
+    assert invalid_token.status_code == 401
 
 
 @pytest.mark.parametrize(
