@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from app.db.database import Base
 
 class Usuario(Base):
@@ -18,3 +18,13 @@ class Cooperativa(Base):
     nombre = Column(String(100), unique=True, nullable=False)
     logo_url = Column(String(255), nullable=True)
     color_principal = Column(String(7), nullable=True)
+    
+class Bus(Base):
+    __tablename__ = "buses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    placa = Column(String(20), unique=True, nullable=False)
+    numero_disco = Column(String(10), nullable=False)
+    capacidad_asientos = Column(Integer, nullable=False)
+    cooperativa_id = Column(Integer, ForeignKey("cooperativas.id"), nullable=False)
+    activo = Column(Boolean, default=True)
