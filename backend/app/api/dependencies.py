@@ -1,8 +1,11 @@
+from collections.abc import Callable
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
 
+from app.core.roles import Role, normalize_role
 from app.core.security import decode_access_token
 from app.db.database import get_db
 from app.models.core_models import Usuario
@@ -33,3 +36,17 @@ def get_current_user(
     if user is None or not user.activo:
         raise unauthorized
     return user
+
+
+def require_roles(*roles: str | Role) -> Callable[..., Usuario]:
+    allowed_roles = {normalize_role(role) for role in roles}
+
+    def role_dependency(user: Usuario = Depends(get_current_user)) -> Usuario:
+        if normalize_role(user.rol) not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
+            )
+        return user
+
+    return role_dependency
